@@ -35,6 +35,16 @@ class Cache {
     }
   }
 
+  isReady() {
+    for (const file of [CRL_FILE_PATH, SIGNATURES_FILE_PATH, RULES_FILE_PATH, SIGNATURES_LIST_FILE_PATH]) {
+      if (!fs.existsSync(file)) {
+        return false;
+      }
+    }
+    const crlStatus = this.getCRLStatus();
+    return crlStatus.version !== 0 && crlStatus.completed;
+  }
+
   async checkCrlManagerSetUp() {
     if (this._crlManager) {
       await this._crlManager.tearDown();
@@ -73,7 +83,8 @@ class Cache {
   }
 
   needCRLUpdate() {
-    if (this.getCRLStatus().version === 0) return true;
+    const crlStatus = this.getCRLStatus();
+    if (crlStatus.version === 0 || !crlStatus.completed) return true;
     return this.fileNeedsUpdate(CRL_FILE_PATH, UPDATE_WINDOW_HOURS);
   }
 
@@ -91,7 +102,7 @@ class Cache {
 
   getCRLStatus() {
     const crlStatus = JSON.parse(fs.readFileSync(CRL_FILE_PATH));
-    crlStatus.completed = (crlStatus.chunk - crlStatus.totalChunk) === 0;
+    crlStatus.completed = crlStatus.totalChunk === crlStatus.chunk;
     return crlStatus;
   }
 

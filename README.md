@@ -14,7 +14,7 @@ Official VerificaC19 SDK implementation for Node.js ([official SDKs list](https:
 - MongoDB version >= 5.x (used to store CRL)
 
 ⚠️ If you don't want to use MongoDB to store CRL, 
-read [how to write your own CRL management system](https://github.com/italia/verificac19-sdk/blob/master/CUSTOM_CRL.md).
+read [how to write your own CRL management system](https://github.com/italia/verificac19-sdk/blob/master/docs/en/CUSTOM_CRL.md).
 
 ## Installation
 
@@ -32,7 +32,7 @@ connection string is `mongodb://root:example@localhost:27017/VC19?authSource=adm
 if you want to change it, set `VC19_MONGODB_URL` env variable.
 
 ⚠️ If you don't want to use MongoDB to store CRL, 
-read [how to write your own CRL management system](https://github.com/italia/verificac19-sdk/blob/master/CUSTOM_CRL.md).
+read [how to write your own CRL management system](https://github.com/italia/verificac19-sdk/blob/master/docs/en/CUSTOM_CRL.md).
 
 ### Download and cache rules, CRL data and DSCs
 
@@ -83,6 +83,8 @@ Loaded DCC has the following structure:
 }
 ```
 
+👉🏻 `fromImage` and `fromRaw` methods may rise `CertificateParsingError`.
+
 You can verify a DCC using `Validator` module.
 
 ```js
@@ -109,14 +111,14 @@ const main = async () => {
 
 you can compare the resulting `code` with `Validator.codes` values
 
-| | Code            | Description                              |
-|-| --------------- | ---------------------------------------- |
-|✅| VALID           | Certificate is valid                     |
-|❌| NOT_VALID       | Certificate is not valid                 | 
-|❌| NOT_VALID_YET   | Certificate is not valid yet             | 
-|❌| TEST_NEEDED     | Test needed if verification mode is BOOSTER_DGP | 
-|❌| REVOKED   | Certificate is revoked           | 
-|❌| NOT_EU_DCC      | Certificate is not an EU DCC             | 
+| | Code            | Description                              | Result |
+|-| --------------- | ---------------------------------------- | ------ |
+|✅| VALID           | Certificate is valid                     | `true` |
+|⚠️| TEST_NEEDED     | Test needed if verification mode is BOOSTER_DGP | `false` |
+|❌| NOT_VALID       | Certificate is not valid                 | `false` |
+|❌| NOT_VALID_YET   | Certificate is not valid yet             | `false` |
+|❌| REVOKED   | Certificate is revoked           | `false` |
+|❌| NOT_EU_DCC      | Certificate is not an EU DCC             | `false` |
 
 for example 
 
@@ -124,6 +126,9 @@ for example
 const validationResult = await Validator.validate(dccTest);
 console.log(validationResult.code === Validator.codes.NOT_VALID);
 ```
+
+👉🏻 `validate` method may rise `CertificateVerificationError` (e.g. when cache is
+not ready yet).
 
 👉🏻  See an example [examples/verifydccs.js](https://github.com/italia/verificac19-sdk/blob/master/examples/verifydccs.js).
 
