@@ -11,9 +11,6 @@ Implementazione ufficiale per Node.js di VerificaC19 SDK ([lista degli SDK uffic
 - Node.js versione >= 12.x
 - MongoDB versione >= 5.x (usato per memorizzare la CRL)
 
-⚠️ Se non vuoi usare MongoDB per la CRL, 
-leggi [come scrivere il proprio sistema di gestione CRL](https://github.com/italia/verificac19-sdk/blob/master/docs/it/CUSTOM_CRL.md).
-
 ## Installazione
 
 ```sh
@@ -26,9 +23,11 @@ npm i verificac19-sdk
 
 La CRL viene memorizzata su un database MongoDB. Questo repository fornisce un 
 file `docker-compose.yml` (come istanza di sviluppo) con un replica set.
+
 Di default la stringa di connessione è
-`mongodb://root:example@localhost:27017/VC19?authSource=admin`, ed è possibile 
-cambiarla settando la variabile di ambiente `VC19_MONGODB_URL`.
+`mongodb://root:example@localhost:27017/VC19?authSource=admin`, ed è possibile modificarla utilizzando la libreria integrata [dotenv](https://www.npmjs.com/package/dotenv), per fare ciò bisogna creare un file chiamato .env nella cartella di root e impostare il valore per la proprietà `VC19_MONGODB_URL`.
+
+👉🏻  Vedi l'esempio [examples/.env](https://github.com/italia/verificac19-sdk/blob/master/examples/.env).
 
 ⚠️ Se non vuoi utilizzare MongoDB per gestire la CRL, 
 leggi [come scrivere il proprio sistema di gestione CRL](https://github.com/italia/verificac19-sdk/blob/master/docs/it/CUSTOM_CRL.md).
@@ -46,7 +45,10 @@ const main = async () => {
 ```
 
 ⚠️ Regole e DSC vengono salvati di default nella cartella `.cache`, 
-per cambiare questa impostazione occorre settare la variabile di ambiente `VC19_CACHE_FOLDER`.
+per cambiare questa impostazione occorre settare il valore `VC19_CACHE_FOLDER` nel file `.env`.
+
+⏱ Di default `updateAll` può scaricare i nuovi dati ogni 24 ore.
+Per cambiare questo valore, settare la variable `VC19_UPDATE_HOURS` nel file `.env`.
 
 👉🏻  Vedi l'esempio [examples/syncdata.js](https://github.com/italia/verificac19-sdk/blob/master/examples/syncdata.js).
 

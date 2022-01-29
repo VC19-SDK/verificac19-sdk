@@ -1,3 +1,4 @@
+require('dotenv').config(); // required for MongoDB connection string
 const axios = require('axios');
 const cache = require('./cache');
 
@@ -57,6 +58,7 @@ const updateCRL = async () => {
       } else {
         break;
       }
+    // eslint-disable-next-line no-constant-condition
     } while (true);
   }
 };
