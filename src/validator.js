@@ -22,8 +22,9 @@ const ASTRAZENECA = 'EU/1/21/1529';
 const COVISHIELD = 'Covishield';
 const R_COVI = 'R-COVI';
 const COVID19_RECOMBINANT = 'Covid-19-recombinant';
+const NUVAXOID = 'EU/1/21/1618';
 
-const VACCINES_EMA_LIST = [JOHNSON, MODERNA, PFIZER, ASTRAZENECA, COVISHIELD, R_COVI, COVID19_RECOMBINANT];
+const VACCINES_EMA_LIST = [JOHNSON, MODERNA, PFIZER, ASTRAZENECA, COVISHIELD, R_COVI, COVID19_RECOMBINANT, NUVAXOID];
 
 // Vaccination status
 const VACCINATION_STATUS = {
@@ -142,11 +143,9 @@ const checkVaccinations = (certificate, rules, mode) => {
       };
     }
 
-    const startNow = new Date(Date.now());
-    const endNow = new Date(Date.now());
+    const verificationMoment = new Date(Date.now());
 
-    startNow.setUTCHours(0, 0, 0, 0);
-    endNow.setUTCHours(23, 59, 59, 999);
+    verificationMoment.setUTCHours(0, 0, 0, 0);
 
     let startDate = new Date(
       Date.parse(clearExtraTime(last.dateOfVaccination)),
@@ -401,7 +400,7 @@ const checkVaccinations = (certificate, rules, mode) => {
     endDate = addDays(endDate, vaccineEndDay.value);
 
     // Not valid yet
-    if (startDate > endNow) {
+    if (startDate > verificationMoment) {
       return {
         code: NOT_VALID_YET,
         message:
@@ -412,7 +411,7 @@ const checkVaccinations = (certificate, rules, mode) => {
     }
 
     // Valid only if no test is required
-    if (endNow <= endDate) {
+    if (verificationMoment <= endDate) {
       if (testRequired) {
         return {
           code: TEST_NEEDED,
@@ -432,7 +431,7 @@ const checkVaccinations = (certificate, rules, mode) => {
     }
 
     // Test needed in case of extension
-    if (vaccineEndDayExtended && endNow < addDays(endDate, vaccineEndDayExtended.value)) {
+    if (vaccineEndDayExtended && verificationMoment < addDays(endDate, vaccineEndDayExtended.value)) {
       return {
         code: TEST_NEEDED,
         message: 'Test needed',
@@ -440,7 +439,7 @@ const checkVaccinations = (certificate, rules, mode) => {
     }
 
     // Not valid if expired
-    if (startNow > endDate) {
+    if (verificationMoment > endDate) {
       return {
         code: NOT_VALID,
         message:
